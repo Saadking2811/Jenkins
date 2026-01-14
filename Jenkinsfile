@@ -5,6 +5,10 @@ pipeline {
         skipStagesAfterUnstable()
     }
 
+    environment {
+        GRADLE_OPTS = '-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000'
+    }
+
     stages {
 
         // ===========================
