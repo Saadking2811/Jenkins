@@ -6,7 +6,8 @@ pipeline {
     }
 
     environment {
-        GRADLE_OPTS = '-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000'
+        GRADLE_OPTS = '-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3'
+        JAVA_TOOL_OPTIONS = '-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3'
     }
 
     stages {
@@ -15,7 +16,11 @@ pipeline {
         stage('Test') {
             steps {
                 echo "Phase Test: Lancement des tests unitaires"
-                bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat clean test'
+                bat '''
+                    set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                    set JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                    gradlew.bat clean test --no-daemon
+                '''
 
                 echo "Archivage des résultats des tests unitaires"
                 junit 'build/test-results/test/*.xml'
@@ -23,7 +28,11 @@ pipeline {
                 echo "Génération des rapports de tests Cucumber"
                 script {
                     try {
-                        bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat generateCucumberReports'
+                        bat '''
+                            set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                            set JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                            gradlew.bat generateCucumberReports --no-daemon
+                        '''
                         publishHTML([
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
@@ -44,7 +53,11 @@ pipeline {
             steps {
                 echo "Analyse du code avec SonarQube"
                 withSonarQubeEnv('sonar') {
-                    bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat sonar'
+                    bat '''
+                        set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                        set JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                        gradlew.bat sonar --no-daemon
+                    '''
                 }
             }
         }
@@ -63,7 +76,11 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Génération du Jar et de la documentation"
-                bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat jar javadoc'
+                bat '''
+                    set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                    set JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                    gradlew.bat jar javadoc --no-daemon
+                '''
 
                 echo "Archivage du fichier Jar"
                 archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
@@ -77,7 +94,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Déploiement du Jar sur Maven repo"
-                bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat publish'
+                bat '''
+                    set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                    set JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dhttps.protocols=TLSv1.2,TLSv1.3
+                    gradlew.bat publish --no-daemon
+                '''
             }
         }
 
