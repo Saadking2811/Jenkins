@@ -15,7 +15,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo "Phase Test: Lancement des tests unitaires"
-                bat 'gradlew.bat clean test'
+                bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat clean test'
 
                 echo "Archivage des résultats des tests unitaires"
                 junit 'build/test-results/test/*.xml'
@@ -23,7 +23,7 @@ pipeline {
                 echo "Génération des rapports de tests Cucumber"
                 script {
                     try {
-                        bat 'gradlew.bat generateCucumberReports'
+                        bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat generateCucumberReports'
                         publishHTML([
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
@@ -44,7 +44,7 @@ pipeline {
             steps {
                 echo "Analyse du code avec SonarQube"
                 withSonarQubeEnv('sonar') {
-                    bat 'gradlew.bat sonar'
+                    bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat sonar'
                 }
             }
         }
@@ -63,7 +63,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Génération du Jar et de la documentation"
-                bat 'gradlew.bat jar javadoc'
+                bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat jar javadoc'
 
                 echo "Archivage du fichier Jar"
                 archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
@@ -77,7 +77,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Déploiement du Jar sur Maven repo"
-                bat 'gradlew.bat publish'
+                bat 'set GRADLE_OPTS=-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT && gradlew.bat publish'
             }
         }
 
