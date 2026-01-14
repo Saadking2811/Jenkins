@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id "com.github.spacialcircumstances.gradle-cucumber-reporting" version "0.1.25"
-    id "jacoco"
+    // id "jacoco"  // Désactivé temporairement - problème SSL Jenkins
     id 'org.sonarqube' version "4.4.1.3373"
     id 'maven-publish'
 }
@@ -31,20 +31,20 @@ cucumberReports {
     reports = files('build/reports/cucumber/cucumber.json')
 }
 
-// Configuration JaCoCo
-jacoco {
-    toolVersion = "0.8.10"
-}
+// Configuration JaCoCo - Désactivé temporairement
+// jacoco {
+//     toolVersion = "0.8.10"
+// }
 
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
-        csv.required = false
-        html.required = true
-        html.destination = file("${buildDir}/reports/jacoco")
-    }
-}
+// jacocoTestReport {
+//     dependsOn test
+//     reports {
+//         xml.required = true
+//         csv.required = false
+//         html.required = true
+//         html.destination = file("${buildDir}/reports/jacoco")
+//     }
+// }
 
 // Configuration SonarQube
 sonar {
@@ -98,7 +98,7 @@ test {
     // Configuration pour générer les rapports Cucumber en JSON
     systemProperty "cucumber.plugin", "json:build/reports/cucumber/cucumber.json"
 
-    finalizedBy jacocoTestReport
+    // finalizedBy jacocoTestReport  // Désactivé temporairement
 
     // Génère les rapports même si les tests échouent
     ignoreFailures = false
@@ -106,5 +106,5 @@ test {
 
 // La tâche sonar dépend des tests
 tasks.named('sonar') {
-    dependsOn test, jacocoTestReport
+    dependsOn test  // jacocoTestReport désactivé temporairement
 }
